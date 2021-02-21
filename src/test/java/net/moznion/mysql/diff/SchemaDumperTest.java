@@ -29,7 +29,7 @@ public class SchemaDumperTest {
   public static class ForConstructors {
     @Test
     public void shouldInstantiateAsDefault()
-        throws SQLException, IOException, InterruptedException {
+        throws SQLException, IOException, InterruptedException, ClassNotFoundException {
       SchemaDumper schemaDumper = new SchemaDumper();
       try {
         schemaDumper.dump(SQL_FOR_TEST);
@@ -42,38 +42,9 @@ public class SchemaDumperTest {
     }
 
     @Test
-    public void shouldInstantiateByMysqldumpPath() throws SQLException, IOException,
-        InterruptedException {
-      SchemaDumper schemaDumper = new SchemaDumper("mysqldump");
-      try {
-        schemaDumper.dump(SQL_FOR_TEST);
-        assertTrue(true);
-      } catch (CommunicationsException e) {
-        assumeTrue("MySQL maybe not launched", false);
-      } catch (Exception e) {
-        assertTrue(false);
-      }
-    }
-
-    @Test
     public void shouldInstantiateByLocalMySqlConnectionInfo() throws SQLException, IOException,
-        InterruptedException {
+        InterruptedException , ClassNotFoundException{
       SchemaDumper schemaDumper = new SchemaDumper(MySqlConnectionInfo.builder().build());
-      try {
-        schemaDumper.dump(SQL_FOR_TEST);
-        assertTrue(true);
-      } catch (CommunicationsException e) {
-        assumeTrue("MySQL maybe not launched", false);
-      } catch (Exception e) {
-        assertTrue(false);
-      }
-    }
-
-    @Test
-    public void shouldInstantiateByAllArgs()
-        throws SQLException, IOException, InterruptedException {
-      SchemaDumper schemaDumper =
-          new SchemaDumper(MySqlConnectionInfo.builder().build(), "mysqldump");
       try {
         schemaDumper.dump(SQL_FOR_TEST);
         assertTrue(true);
@@ -87,7 +58,7 @@ public class SchemaDumperTest {
     @Test
     public void shouldRaiseIllegalArgumentExceptionByNullConnectionInfo() {
       try {
-        new SchemaDumper(null, "mysqldump");
+        new SchemaDumper(null);
       } catch (IllegalArgumentException e) {
         assertTrue(true);
         return;
@@ -97,25 +68,13 @@ public class SchemaDumperTest {
       assertTrue(false);
     }
 
-    @Test
-    public void shouldRaiseIllegalArgumentExceptionByNullMysqldumpPath() {
-      try {
-        new SchemaDumper(MySqlConnectionInfo.builder().build(), null);
-      } catch (IllegalArgumentException e) {
-        assertTrue(true);
-        return;
-      } catch (Exception e) {
-        assertTrue(false);
-      }
-      assertTrue(false);
-    }
   }
 
   public static class ForDumpMethods {
     private SchemaDumper schemaDumper = new SchemaDumper();
 
     @Test
-    public void shouldDumpBySqlString() throws SQLException, IOException, InterruptedException {
+    public void shouldDumpBySqlString() throws SQLException, IOException, InterruptedException , ClassNotFoundException{
       try {
         schemaDumper.dump(SQL_FOR_TEST);
         assertTrue(true);
@@ -128,7 +87,7 @@ public class SchemaDumperTest {
 
     @Test
     public void shouldDumpBySqlFileWithDefaultCharset()
-        throws IOException, SQLException, InterruptedException {
+        throws IOException, SQLException, InterruptedException , ClassNotFoundException{
       File sqlFile = File.createTempFile("tempsql", ".sql");
 
       try (BufferedWriter bufferedWriter =
@@ -151,7 +110,7 @@ public class SchemaDumperTest {
 
     @Test
     public void shouldDumpBySqlFileWithSpecifiedCharset()
-        throws IOException, SQLException, InterruptedException {
+        throws IOException, SQLException, InterruptedException , ClassNotFoundException{
       File sqlFile = File.createTempFile("tempsql", ".sql");
 
       try (BufferedWriter bufferedWriter =
@@ -175,7 +134,7 @@ public class SchemaDumperTest {
 
     @Test
     public void shouldDumpFromLocalMySql()
-        throws SQLException, IOException, InterruptedException {
+        throws SQLException, IOException, InterruptedException , ClassNotFoundException{
       MySqlConnectionInfo connInfo = MySqlConnectionInfo.builder().build();
 
       String tempDbName = new StringBuilder()
@@ -210,7 +169,7 @@ public class SchemaDumperTest {
     }
 
     @Test
-    public void shouldDumpFromRemoteMySql() throws SQLException, IOException, InterruptedException {
+    public void shouldDumpFromRemoteMySql() throws SQLException, IOException, InterruptedException, ClassNotFoundException {
       MySqlConnectionInfo connInfo = MySqlConnectionInfo.builder().build();
 
       String tempDbName = new StringBuilder()

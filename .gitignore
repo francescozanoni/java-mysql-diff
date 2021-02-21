@@ -18,5 +18,7 @@ hs_err_pid*
 
 /.checkstyle
 /.classpath
+/.idea/
 /.project
 /.settings/
+/*.iml

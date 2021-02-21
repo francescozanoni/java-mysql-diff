@@ -75,7 +75,7 @@ public class App {
    * @throws SQLException Throw if invalid SQL is given.
    * @throws InterruptedException Throw if mysqldump command is failed.
    */
-  public static void main(String[] args) throws IOException, SQLException, InterruptedException {
+  public static void main(String[] args) throws IOException, SQLException, InterruptedException, ClassNotFoundException {
     App app = new App();
 
     CmdLineParser parser = new CmdLineParser(app);

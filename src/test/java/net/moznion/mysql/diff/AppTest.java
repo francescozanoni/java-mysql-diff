@@ -29,7 +29,7 @@ public class AppTest {
       + ") ENGINE=InnoDB DEFAULT CHARSET=utf8;\n";
 
   @Test
-  public void shouldShowVersion() throws IOException, SQLException, InterruptedException {
+  public void shouldShowVersion() throws IOException, SQLException, InterruptedException , ClassNotFoundException{
     // For short option
     ByteArrayOutputStream baos = new ByteArrayOutputStream();
     System.setOut(new PrintStream(baos));
@@ -54,7 +54,7 @@ public class AppTest {
   }
 
   @Test
-  public void shouldShowUsageByOption() throws IOException, SQLException, InterruptedException {
+  public void shouldShowUsageByOption() throws IOException, SQLException, InterruptedException, ClassNotFoundException {
     // For short option
     ByteArrayOutputStream baos = new ByteArrayOutputStream();
     System.setOut(new PrintStream(baos));
@@ -98,7 +98,7 @@ public class AppTest {
   }
 
   @Test
-  public void shouldTakeDiffBetweenFiles() throws IOException, SQLException, InterruptedException {
+  public void shouldTakeDiffBetweenFiles() throws IOException, SQLException, InterruptedException, ClassNotFoundException {
     File sqlFile1 = File.createTempFile("tempsql1", ".sql");
     File sqlFile2 = File.createTempFile("tempsql2", ".sql");
 
@@ -127,7 +127,7 @@ public class AppTest {
   @edu.umd.cs.findbugs.annotations.SuppressFBWarnings(
       value = "SQL_NONCONSTANT_STRING_PASSED_TO_EXECUTE")
   public void shouldTakeDiffBetweenLocalDb()
-      throws IOException, SQLException, InterruptedException {
+      throws IOException, SQLException, InterruptedException, ClassNotFoundException {
     MySqlConnectionInfo connInfo = MySqlConnectionInfo.builder().build();
 
     String tempDbName1 = new StringBuilder()
@@ -180,7 +180,7 @@ public class AppTest {
   @edu.umd.cs.findbugs.annotations.SuppressFBWarnings(
       value = "SQL_NONCONSTANT_STRING_PASSED_TO_EXECUTE")
   public void shouldTakeDiffBetweenRemoteDb() throws IOException, SQLException,
-      InterruptedException {
+      InterruptedException, ClassNotFoundException {
     MySqlConnectionInfo connInfo = MySqlConnectionInfo.builder().build();
 
     final String tempDbName1 = new StringBuilder()

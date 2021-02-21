@@ -17,6 +17,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
+import com.smattme.MysqlExportService;
+import java.util.Properties;
 
 /**
  * Dumper for SQL table definition.
@@ -28,67 +30,32 @@ public class SchemaDumper {
   private static final String LINE_SEPARATOR = System.lineSeparator();
 
   private final MySqlConnectionInfo localMySqlConnectionInfo;
-  private final String mysqldumpPath;
 
   /**
    * Instantiate SchemaDumper.
-   * 
-   * @param localMySqlConnectionInfo Connection information of MySQL which is on your local
-   *        environment.
-   * @param mysqldumpPath Path for mysqldump command.
-   */
-  public SchemaDumper(MySqlConnectionInfo localMySqlConnectionInfo, String mysqldumpPath) {
-    if (localMySqlConnectionInfo == null) {
-      throw new IllegalArgumentException("mysqlConnectionInfo must not be null");
-    }
-
-    if (mysqldumpPath == null) {
-      throw new IllegalArgumentException("mysqldumpPath must not be null");
-    }
-
-    this.localMySqlConnectionInfo = localMySqlConnectionInfo;
-    this.mysqldumpPath = mysqldumpPath;
-  }
-
-  /**
-   * Instantiate SchemaDumper.
-   * 
-   * <p>
-   * Path of mysqldump will be used default as "mysqldump".
-   * </p>
    * 
    * @param localMySqlConnectionInfo Connection information of MySQL which is on your local
    *        environment.
    */
   public SchemaDumper(MySqlConnectionInfo localMySqlConnectionInfo) {
-    this(localMySqlConnectionInfo, "mysqldump");
+    if (localMySqlConnectionInfo == null) {
+      throw new IllegalArgumentException("mysqlConnectionInfo must not be null");
+    }
+
+    this.localMySqlConnectionInfo = localMySqlConnectionInfo;
   }
 
   /**
    * Instantiate SchemaDumper.
    * 
    * <p>
-   * Connection information of local MySQL will be used default as "-h localhost -u root".
-   * </p>
-   * 
-   * @param mysqldumpPath Path for mysqldump command.
-   */
-  public SchemaDumper(String mysqldumpPath) {
-    this(MySqlConnectionInfo.builder().build(), mysqldumpPath);
-  }
-
-  /**
-   * Instantiate SchemaDumper.
-   * 
-   * <p>
-   * Path of mysqldump will be used default as "mysqldump".<br>
    * Connection information of local MySQL will be used default as "-h localhost -u root".
    * </p>
    */
   public SchemaDumper() {
     this(MySqlConnectionInfo.builder().build());
   }
-
+ 
   /**
    * Dump schema from SQL string.
    * 
@@ -98,7 +65,7 @@ public class SchemaDumper {
    * @throws IOException Throw if mysqldump command is failed.
    * @throws InterruptedException Throw if mysqldump command is failed.
    */
-  public String dump(String sql) throws SQLException, IOException, InterruptedException {
+  public String dump(String sql) throws SQLException, IOException, InterruptedException, ClassNotFoundException {
     String tempDbName = new StringBuilder()
         .append("tmp_")
         .append(UUID.randomUUID().toString().replaceAll("-", ""))
@@ -144,7 +111,7 @@ public class SchemaDumper {
    * @throws InterruptedException Throw if mysqldump command is failed.
    */
   public String dump(File sqlFile, Charset charset)
-      throws IOException, SQLException, InterruptedException {
+      throws IOException, SQLException, InterruptedException, ClassNotFoundException {
     String sqlString =
         new String(Files.readAllBytes(Paths.get(sqlFile.getAbsolutePath())), charset);
     return dump(sqlString);
@@ -159,7 +126,7 @@ public class SchemaDumper {
    * @throws IOException Throw if mysqldump command is failed.
    * @throws InterruptedException Throw if mysqldump command is failed.
    */
-  public String dump(File sqlFile) throws IOException, SQLException, InterruptedException {
+  public String dump(File sqlFile) throws IOException, SQLException, InterruptedException, ClassNotFoundException {
     return dump(sqlFile, StandardCharsets.UTF_8);
   }
 
@@ -173,7 +140,7 @@ public class SchemaDumper {
    * @throws InterruptedException Throw if mysqldump command is failed.
    */
   public String dumpFromLocalDb(String dbName)
-      throws IOException, InterruptedException, SQLException {
+      throws IOException, InterruptedException, SQLException, ClassNotFoundException {
     return fetchSchemaViaMysqldump(dbName);
   }
 
@@ -188,61 +155,38 @@ public class SchemaDumper {
    * @throws InterruptedException Throw if mysqldump command is failed.
    */
   public String dumpFromRemoteDb(String dbName, MySqlConnectionInfo mysqlConnectionInfo)
-      throws IOException, InterruptedException, SQLException {
+      throws IOException, InterruptedException, SQLException, ClassNotFoundException {
     String schema = fetchSchemaViaMysqldump(dbName, mysqlConnectionInfo);
     return dump(schema);
   }
 
   private String fetchSchemaViaMysqldump(String dbName, MySqlConnectionInfo mysqlConnectionInfo)
-      throws IOException, InterruptedException {
+      throws IOException, InterruptedException, SQLException, ClassNotFoundException {
     String schema;
-    List<String> mysqldumpCommand = new ArrayList<>(Arrays.asList(
-        mysqldumpPath,
-        "--no-data=true",
-        dbName));
-
-    String mysqlUser = mysqlConnectionInfo.getUser();
-    if (!mysqlUser.isEmpty()) {
-      mysqldumpCommand.add(new StringBuilder().append("-u").append(mysqlUser).toString());
-    }
-
+ 
     String mysqlHost = mysqlConnectionInfo.getHost();
-    if (!mysqlHost.isEmpty()) {
-      mysqldumpCommand.add(new StringBuilder().append("-h").append(mysqlHost).toString());
-    }
+    String mysqlUser = mysqlConnectionInfo.getUser();
+    String mysqlPass = mysqlConnectionInfo.getPass();
 
-    ProcessBuilder processBuilder = new ProcessBuilder(mysqldumpCommand);
+    //required properties for exporting of db
+Properties properties = new Properties();
+properties.setProperty(MysqlExportService.DB_NAME, mysqlHost);
+properties.setProperty(MysqlExportService.DB_USERNAME, mysqlUser);
+properties.setProperty(MysqlExportService.DB_PASSWORD, mysqlPass);
 
-    Process process = processBuilder.start();
-    try (InputStream inputStream = process.getInputStream()) {
-      StringBuilder stdoutStringBuilder = new StringBuilder();
-      try (BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream))) {
-        String line;
-        while ((line = bufferedReader.readLine()) != null) {
-          stdoutStringBuilder.append(line).append(LINE_SEPARATOR);
-        }
-      }
-      schema = stdoutStringBuilder.toString();
-    }
+//set the outputs temp dir
+properties.setProperty(MysqlExportService.TEMP_DIR, new File("external").getPath());
 
-    if (process.waitFor() != 0) {
-      throw new RuntimeException(
-          new StringBuilder()
-              .append("Failed to execute `mysqldump` command.\n")
-              .append("[command] >>>\n")
-              .append(String.join(" ", mysqldumpCommand))
-              .append("\n<<<\n")
-              .append("[output] >>>\n")
-              .append(schema)
-              .append("\n<<<\n")
-              .toString());
-    }
+MysqlExportService mysqlExportService = new MysqlExportService(properties);
+mysqlExportService.export();
+
+schema = mysqlExportService.getGeneratedSql();
 
     return schema;
   }
 
   private String fetchSchemaViaMysqldump(String dbName)
-      throws IOException, InterruptedException, SQLException {
+      throws IOException, InterruptedException, SQLException, ClassNotFoundException {
     return fetchSchemaViaMysqldump(dbName, localMySqlConnectionInfo);
   }
 }

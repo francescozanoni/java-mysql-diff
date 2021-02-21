@@ -23,7 +23,7 @@ public class DiffExtractorTest {
 
   public static class ForTableDiff {
     private String getAlterTableDiffRightly(String oldSql, String newSql) throws SQLException,
-        IOException, InterruptedException {
+        IOException, InterruptedException, ClassNotFoundException {
       String oldSchema = SCHEMA_DUMPER.dump(oldSql);
       String newSchema = SCHEMA_DUMPER.dump(newSql);
 
@@ -43,7 +43,7 @@ public class DiffExtractorTest {
 
     @Test
     public void shouldDetectColumnDiffRightly() throws SQLException, IOException,
-        InterruptedException {
+        InterruptedException , ClassNotFoundException{
       String oldSql = "CREATE TABLE `sample` ("
           + "  `id` int(10) NOT NULL AUTO_INCREMENT,"
           + "  `title` varchar(64) NOT NULL,"
@@ -75,7 +75,7 @@ public class DiffExtractorTest {
 
     @Test
     public void shouldDetectKeyDiffRightly()
-        throws SQLException, IOException, InterruptedException {
+        throws SQLException, IOException, InterruptedException , ClassNotFoundException{
       String oldSql = "CREATE TABLE `sample` ("
           + "  `id` int(10) NOT NULL AUTO_INCREMENT,"
           + "  `name` varchar(16) NOT NULL,"
@@ -120,7 +120,7 @@ public class DiffExtractorTest {
   public static class ForMissingTable {
     @Test
     public void shouldDetectMissingTableRightly() throws SQLException, IOException,
-        InterruptedException {
+        InterruptedException , ClassNotFoundException{
       String oldSql = "CREATE TABLE `sample` ("
           + "  `id` int(10) NOT NULL AUTO_INCREMENT,"
           + "  PRIMARY KEY (`id`)"

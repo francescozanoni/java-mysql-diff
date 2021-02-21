@@ -28,6 +28,11 @@
 			<version>2.0.29</version>
 		</dependency>
 		<dependency>
+              <groupId>com.smattme</groupId>
+              <artifactId>mysql-backup4j</artifactId>
+              <version>1.2.0</version>
+         </dependency>
+		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<version>4.13.1</version>
@@ -36,7 +41,10 @@
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
-			<version>1.14.8</version>
+			<!-- This version causes error "Fatal error compiling: java.lang.ExceptionInInitializerError: com.sun.tool.javac.code.TypeTags" -->
+			<!-- https://stackoverflow.com/questions/50315508/errorjava-java-lang-exceptionininitializererror-intellij -->
+			<!-- <version>1.14.8</version> -->
+			<version>1.18.18</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
@@ -191,8 +199,8 @@
 	<reporting>
 		<plugins>
 			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>findbugs-maven-plugin</artifactId>
+				<groupId>com.google.code.findbugs</groupId>
+				<artifactId>findbugs</artifactId>
 				<version>3.0.0</version>
 			</plugin>
 		</plugins>
