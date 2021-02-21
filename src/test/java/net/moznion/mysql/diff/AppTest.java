@@ -124,8 +124,6 @@ public class AppTest {
   }
 
   @Test
-  @edu.umd.cs.findbugs.annotations.SuppressFBWarnings(
-      value = "SQL_NONCONSTANT_STRING_PASSED_TO_EXECUTE")
   public void shouldTakeDiffBetweenLocalDb()
       throws IOException, SQLException, InterruptedException, ClassNotFoundException {
     MySqlConnectionInfo connInfo = MySqlConnectionInfo.builder().build();
@@ -177,8 +175,6 @@ public class AppTest {
   }
 
   @Test
-  @edu.umd.cs.findbugs.annotations.SuppressFBWarnings(
-      value = "SQL_NONCONSTANT_STRING_PASSED_TO_EXECUTE")
   public void shouldTakeDiffBetweenRemoteDb() throws IOException, SQLException,
       InterruptedException, ClassNotFoundException {
     MySqlConnectionInfo connInfo = MySqlConnectionInfo.builder().build();

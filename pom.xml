@@ -47,12 +47,6 @@
 			<version>1.18.18</version>
 			<scope>provided</scope>
 		</dependency>
-		<dependency>
-			<groupId>com.google.code.findbugs</groupId>
-			<artifactId>findbugs</artifactId>
-			<version>3.0.0</version>
-			<scope>test</scope>
-		</dependency>
 	</dependencies>
 
 	<build>
@@ -195,16 +189,6 @@
 			</properties>
 		</profile>
 	</profiles>
-
-	<reporting>
-		<plugins>
-			<plugin>
-				<groupId>com.google.code.findbugs</groupId>
-				<artifactId>findbugs</artifactId>
-				<version>3.0.0</version>
-			</plugin>
-		</plugins>
-	</reporting>
 
 	<distributionManagement>
 		<snapshotRepository>
